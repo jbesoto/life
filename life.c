@@ -135,7 +135,16 @@ int ConfigureGame(config_t* config, int argc, char* args[]) {
     return 0;
 }
 
-char** CreateCharGrid(int rows, int cols, char ch) {
+// Allocates and initializes a 2D grid of characters.
+//
+// Args:
+//   rows: Number of rows in the grid.
+//   cols: Number of columns in the grid.
+//   ch: Character used to initialize each cell in the grid.
+//
+// Returns:
+//   A pointer to the newly allocated 2D grid.
+char** CreateCharGrid(size_t rows, size_t cols, char ch) {
     char** grid = malloc(sizeof(char*) * rows);
 
     for (size_t i = 0; i < rows; i++) {
@@ -145,6 +154,18 @@ char** CreateCharGrid(int rows, int cols, char ch) {
     return grid;
 }
 
+// Creates the initial world state from a file.
+//
+// Reads the world configuration from the given file descriptor and
+// initializes the world grid based on the file content.
+//
+// Args:
+//   fd:     File descriptor for the file containing the initial world state.
+//   config: Pointer to the configuration struct holding the dimensions and
+//           other settings.
+//
+// Returns:
+//   A pointer to the newly created world grid.
 char** CreateWorld(FILE* fd, const config_t* config) {
     char** world = CreateCharGrid(config->rows + 2, config->cols + 2, '-');
     
@@ -165,6 +186,14 @@ char** CreateWorld(FILE* fd, const config_t* config) {
     return world;
 }
 
+// Frees the memory allocated for a 2D grid.
+//
+// Args:
+//   grid: Pointer to the 2D grid to be freed.
+//   rows: Number of rows in the grid.
+//
+// Returns:
+//   0 to indicate successful deallocation.
 int FreeGrid(char** grid, size_t rows) {
     for (size_t i = 0; i < rows; i++) {
         free(grid[i]);
