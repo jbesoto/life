@@ -22,18 +22,16 @@ static const size_t kOffset = 1;
 // Prints the current state of the world for a given generation.
 //
 // Args:
-//   world: A pointer to a 2D array of characters where each character represents
-//          a cell in the world. '*' for a live cell and '-' for a dead cell.
-//   cols:  The number of columns in the world.
-//   rows:  The number of rows in the world.
-//   gen:   The current generation number that is being printed.
-void PrintWorld(const char** world, size_t rows, size_t cols, int gen) {
+//   world:  A pointer to a 2D array of characters where each character represents
+//           a cell in the world. '*' for a live cell and '-' for a dead cell.
+//   config: A pointer to the config_t structure where the settings are stored.
+//   gen:    The current generation number that is being printed.
+void PrintWorld(const char** world, config_t* config, int gen) {
     printf("Generation %d:\n", gen);
-
-    for (size_t i = 0 + kOffset; i <= rows; i++) {
-        for (size_t j = 0 + kOffset; j <= cols; j++) {
+    for (size_t i = 0 + kOffset; i <= config->rows; i++) {
+        for (size_t j = 0 + kOffset; j <= config->cols; j++) {
             printf("%c", world[i][j]);
-            if (j == cols) {
+            if (j == config->cols) {
                 putchar('\n');
             }
         }
@@ -65,49 +63,49 @@ int ParseLong(const char* arg, size_t* out) {
     return 0;
 }
 
-// Sets the game settings based on the provided command-line arguments.
+// Sets the game configurations based on the provided command-line arguments.
 //
-// This function initializes the game settings to default values and then
+// This function initializes the configurations to default values and then
 // overrides them with any values provided as command-line arguments.
 // The expected order of arguments is [rows] [columns] [filename] [generations].
 // It uses `ParseLong` to safely parse numeric arguments (rows, columns,
 // generations).
 //
 // Args:
-//   settings: A pointer to the config_t structure where the settings will be stored.
-//   argc: The number of command-line arguments.
-//   args: An array of pointers to the strings which are those arguments.
+//   config: A pointer to the config_t structure where the settings are be stored.
+//   argc:   The number of command-line arguments.
+//   args:   An array of pointers to the strings which are those arguments.
 //
 // Returns:
 //   0 if the settings are successfully set.
 //   1 if there is an error such as an invalid input or too many arguments.
-int SetGameSettings(config_t* settings, int argc, char* args[]) {
-    settings->rows = kDefaults.rows;
-    settings->cols = kDefaults.cols;
-    settings->filename = kDefaults.filename;
-    settings->generations = kDefaults.generations;
+int ConfigureGame(config_t* config, int argc, char* args[]) {
+    config->rows = kDefaults.rows;
+    config->cols = kDefaults.cols;
+    config->filename = kDefaults.filename;
+    config->generations = kDefaults.generations;
 
     if (argc > 5) {
         printf("Usage: life [rows] [columns] [filename] [generations]\n");
         return 1;
     }
     if (argc >= 2) {
-        if (ParseLong(args[1], &settings->rows) != 0) {
+        if (ParseLong(args[1], &config->rows) != 0) {
             printf("Error: Invalid input for rows, '%s'\n", args[1]);
             return 1;
         }
     }
     if (argc >= 3) {
-        if (ParseLong(args[2], &settings->cols) != 0) {
+        if (ParseLong(args[2], &config->cols) != 0) {
             printf("Error: Invalid input for columns, '%s'\n", args[2]);
             return 1;
         }
     }
     if (argc >= 4) {
-        settings->filename = args[3];
+        config->filename = args[3];
     }
     if (argc == 5) {
-        if (ParseLong(args[4], &settings->generations) != 0) {
+        if (ParseLong(args[4], &config->generations) != 0) {
             printf("Error: Invalid input for generations, '%s'\n", args[4]);
             return 1;
         }
@@ -125,16 +123,16 @@ char** CreateCharGrid(int rows, int cols, char ch) {
     return grid;
 }
 
-char** CreateWorld(FILE* fd, size_t rows, size_t cols) {
-    char** world = CreateCharGrid(rows + 2, cols + 2, '-');
+char** CreateWorld(FILE* fd, const config_t* config) {
+    char** world = CreateCharGrid(config->rows + 2, config->cols + 2, '-');
     
     char* line = NULL;
     size_t n = 0;
-    for (size_t i = kOffset; i <= rows; i++) {
+    for (size_t i = kOffset; i <= config->rows; i++) {
         if (getline(&line, &n, fd) < 0) {
             break;
         }
-        for (size_t j = kOffset; j <= MIN(cols, n); j++) {
+        for (size_t j = kOffset; j <= MIN(config->cols, n); j++) {
             if (line[j - kOffset] != '*') {
                 continue;
             }
@@ -155,25 +153,25 @@ int FreeGrid(char** world, size_t rows) {
 
 // life [rows] [columns] [filename] [generations]
 int main(int argc, char* argv[]) {
-    config_t settings;
+    config_t config;
 
-    if (SetGameSettings(&settings, argc, argv) != 0) {
+    if (ConfigureGame(&config, argc, argv) != 0) {
         return 1;
     }
 
-    FILE* fd = fopen(settings.filename, "r");
+    FILE* fd = fopen(config.filename, "r");
     if (!fd) {
         perror("Error: File open operation failed");
         return 1;
     }
     
-    char** world = CreateWorld(fd, settings.rows, settings.cols);
+    char** world = CreateWorld(fd, &config);
     fclose(fd);
 
-    for (size_t gen = 0; gen <= settings.generations; gen++) {
-        PrintWorld(world, settings.rows, settings.cols, gen);
-        // play(world);
+    for (size_t gen = 0; gen <= config.generations; gen++) {
+        PrintWorld(world, &config, gen);
+        play(world, &config);
     }
-    FreeGrid(world, settings.rows + 2);
+    FreeGrid(world, config.rows + 2);
     return 0;
 }
