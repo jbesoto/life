@@ -142,17 +142,20 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    FILE* fd = fopen(settings.filename, 'r');
+    FILE* fd = fopen(settings.filename, "r");
     if (!fd) {
         perror("Error: File open operation failed");
         return 1;
     }
     
     char** world = CreateWorld(fd, settings.rows, settings.cols);
+    fclose(fd);
+
     for (size_t gen = 0; gen <= settings.generations; gen++) {
         PrintWorld(world, settings.rows, settings.cols, gen);
         play(world);
     }
+    CleanWorld(world, settings.rows);
 
     fclose(fd);
     CleanWorld(world);
