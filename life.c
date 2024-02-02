@@ -145,8 +145,8 @@ char** CreateWorld(FILE* fd, size_t rows, size_t cols) {
     return world;
 }
 
-int CleanWorld(char** world, size_t rows) {
-    for (size_t i = 0; i < rows + 2; i++) {
+int FreeGrid(char** world, size_t rows) {
+    for (size_t i = 0; i < rows; i++) {
         free(world[i]);
     }
     free(world);
@@ -174,7 +174,6 @@ int main(int argc, char* argv[]) {
         PrintWorld(world, settings.rows, settings.cols, gen);
         // play(world);
     }
-    CleanWorld(world, settings.rows);
-
+    FreeGrid(world, settings.rows + 2);
     return 0;
 }
