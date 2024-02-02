@@ -115,13 +115,19 @@ int SetGameSettings(config_t* settings, int argc, char* args[]) {
     return 0;
 }
 
-char** CreateWorld(FILE* fd, size_t rows, size_t cols) {
-    char** world = malloc(sizeof(char*) * (rows + 2));
-    for (size_t i = 0; i < rows + 2; i++) {
-        world[i] = malloc(sizeof(char) * (cols + 2));
-        memset(world[i], '-', sizeof(char) * (cols + 2));
-    }
+char** CreateCharGrid(int rows, int cols, char ch) {
+    char** grid = malloc(sizeof(char*) * rows);
 
+    for (size_t i = 0; i < rows; i++) {
+        grid[i] = malloc(sizeof(char) * cols);
+        memset(grid[i], ch, sizeof(char) * cols);
+    }
+    return grid;
+}
+
+char** CreateWorld(FILE* fd, size_t rows, size_t cols) {
+    char** world = CreateCharGrid(rows + 2, cols + 2, '-');
+    
     char* line = NULL;
     size_t n = 0;
     for (size_t i = kOffset; i <= rows; i++) {
