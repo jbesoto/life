@@ -143,11 +143,11 @@ char** CreateWorld(FILE* fd, const config_t* config) {
     return world;
 }
 
-int FreeGrid(char** world, size_t rows) {
+int FreeGrid(char** grid, size_t rows) {
     for (size_t i = 0; i < rows; i++) {
-        free(world[i]);
+        free(grid[i]);
     }
-    free(world);
+    free(grid);
     return 0;
 }
 
