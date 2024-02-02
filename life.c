@@ -19,6 +19,28 @@ static const config_t kDefaults = {10, 10, "life.txt", 10};
 static const size_t kOffset = 1;
 
 
+// Determines if a cell is alive.
+//
+// Args:
+//   cell: A character representing the current state of the cell.
+//
+// Returns:
+//   1 if the cell is alive ('*'), 0 otherwise.
+int IsAlive(char cell) {
+    return cell == '*';
+}
+
+// Determines if a cell is dead.
+//
+// Args:
+//   cell: A character representing the current state of the cell.
+//
+// Returns:
+//   1 if the cell is dead ('-'), 0 otherwise.
+int IsDead(char cell) {
+    return cell == '-';
+}
+
 // Prints the current state of the world for a given generation.
 //
 // Args:
@@ -151,7 +173,73 @@ int FreeGrid(char** grid, size_t rows) {
     return 0;
 }
 
-// life [rows] [columns] [filename] [generations]
+// Computes the next state of a cell.
+//
+// This function calculates the new state of a cell located at (x, y) in the
+// grid. It counts the number of alive neighbors and applies the rules to
+// determine the cell's next state. The cell's state changes based on the
+// number of alive neighbors. Note: '*' for alive, '-' for dead
+//
+// Args:
+//   world: A 2D array representing the game world where each cell contains 
+//          either a live ('*') or a dead ('-') character.
+//   y:     The y-coordinate (row index) of the cell.
+//   x:     The x-coordinate (column index) of the cell.
+//
+// Returns:
+//   The character representing the new state of the cell.
+//
+// Note:
+//   This function assumes that (x, y) are valid coordinates in the world.
+char ComputeCellState(const char** world, size_t y, size_t x) {
+    int neighbor_count = 0;
+    for (size_t i = y - kOffset; i <= y + kOffset; i++) {
+        for (size_t j = x - kOffset; j <= x + kOffset; j++) {
+            if (IsAlive(world[i][j]) && !(i == y && j == x)) {
+                neighbor_count++;
+            }
+        }
+    }
+
+    char new_state = world[y][x];
+    if (IsAlive(world[y][x])) {
+        if (neighbor_count < 2 || neighbor_count > 3) {
+            new_state = '-';
+        }
+    } else if (IsDead(world[y][x]) && neighbor_count == 3) {
+        new_state = '*';
+    }
+
+    return new_state;
+}
+
+// Updates the state of the entire world for the next generation.
+//
+// This function creates a copy of the current state of the world, computes the new state
+// for each cell using ComputeCellState, and updates the world with the new states.
+// It ensures that the original world state is not modified during computation to
+// prevent conflicts between reading the current state and writing the new state.
+//
+// Args:
+//   world:  A pointer to a 2D array representing the current state of the game world.
+//   config: A pointer to the config_t structure containing the game configuration,
+//           including the number of rows, columns, and other settings.
+void play(char** world, const config_t* config) {
+    char** world_copy = CreateCharGrid(config->rows + 2, config->cols + 2, '-');
+    for (size_t i = kOffset; i <= config->rows; i++) {
+        memcpy(world_copy[i], world[i], sizeof(char) * (config->cols + 2));
+    }
+
+    for (size_t i = kOffset; i <= config->rows; i++) {
+        for (size_t j = kOffset; j <= config->cols; j++) {
+            char new_state = ComputeCellState(world_copy, i, j); 
+            world[i][j] = new_state;
+        }
+    }
+    FreeGrid(world_copy, config->rows + 2);
+}
+
+// Usage: life [rows] [columns] [filename] [generations]
 int main(int argc, char* argv[]) {
     config_t config;
 
