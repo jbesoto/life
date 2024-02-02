@@ -67,13 +67,13 @@ int SetGameSettings(config_t* settings, int argc, char* args[]) {
         return 1;
     }
     if (argc >= 2) {
-        if (ParseLong((const char*)args[1], &settings->rows) != 0) {
+        if (ParseLong(args[1], &settings->rows) != 0) {
             printf("Error: Invalid input for rows, '%s'\n", args[1]);
             return 1;
         }
     }
     if (argc >= 3) {
-        if (ParseLong((const char*)args[2], &settings->cols) != 0) {
+        if (ParseLong(args[2], &settings->cols) != 0) {
             printf("Error: Invalid input for columns, '%s'\n", args[2]);
             return 1;
         }
@@ -82,7 +82,7 @@ int SetGameSettings(config_t* settings, int argc, char* args[]) {
         settings->filename = args[3];
     }
     if (argc == 5) {
-        if (ParseLong((const char*)args[4], &settings->generations) != 0) {
+        if (ParseLong(args[4], &settings->generations) != 0) {
             printf("Error: Invalid input for generations, '%s'\n", args[4]);
             return 1;
         }
@@ -120,7 +120,6 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    // Read the file and create world
     FILE* fd = fopen(settings.filename, 'r');
     if (!fd) {
         perror("Error: File open operation failed");
