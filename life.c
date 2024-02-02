@@ -1,6 +1,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+// Struct for storing game configurations
+typedef struct {
+    size_t rows;
+    size_t cols;
+    char* filename;
+    size_t generations;
+} config_t;
+
+static const config_t kDefaults = {10, 10, "life.txt", 10};
+
 // Ensures that world traversal is kept within the valid cells
 static const size_t kOffset = 1;
 
