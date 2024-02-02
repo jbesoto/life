@@ -1,7 +1,7 @@
 all: life
 
 life: life.c
-	gcc -Wall -Wextra life.c -o life
+	gcc -o life life.c
 
 clean:
 	rm -f life
