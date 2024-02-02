@@ -1,6 +1,9 @@
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+
+#define MIN(a, b) (((a) < (b)) ? (a) : (b))
 
 // Struct for storing game configurations
 typedef struct {
@@ -112,26 +115,29 @@ int SetGameSettings(config_t* settings, int argc, char* args[]) {
     return 0;
 }
 
-// Prints the current state of the world for a given generation.
-//
-// Args:
-//   world: A pointer to a 2D array of characters where each character represents
-//          a cell in the world. '*' for a live cell and '-' for a dead cell.
-//   cols:  The number of columns in the world.
-//   rows:  The number of rows in the world.
-//   gen:   The current generation number that is being printed.
-void PrintWorld(const char** world, size_t rows, size_t cols, int gen) {
-    printf("Generation %d:\n", gen);
+char** CreateWorld(FILE* fd, size_t rows, size_t cols) {
+    char** world = malloc(sizeof(char*) * (rows + 2));
+    for (size_t i = 0; i < rows + 2; i++) {
+        world[i] = malloc(sizeof(char) * (cols + 2));
+        memset(world[i], '-', sizeof(char) * (cols + 2));
+    }
 
-    for (size_t i = 0 + kOffset; i <= rows; i++) {
-        for (size_t j = 0 + kOffset; j <= cols; j++) {
-            printf("%c", world[i][j]);
-            if (j == cols) {
-                putchar('\n');
+    char* line = NULL;
+    size_t n = 0;
+    for (size_t i = kOffset; i <= rows; i++) {
+        if (getline(&line, &n, fd) < 0) {
+            break;
+        }
+        for (size_t j = kOffset; j <= MIN(cols, n); j++) {
+            if (line[j - kOffset] != '*') {
+                continue;
             }
+            world[i][j] = line[j - kOffset];
         }
     }
-    printf("================================\n");
+    free(line);
+    return world;
+}
 }
 
 // life [rows] [columns] [filename] [generations]
@@ -157,7 +163,5 @@ int main(int argc, char* argv[]) {
     }
     CleanWorld(world, settings.rows);
 
-    fclose(fd);
-    CleanWorld(world);
     return 0;
 }
