@@ -1,6 +1,6 @@
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <errno.h>
 
 // Struct for storing game configurations
 typedef struct {
@@ -90,15 +90,15 @@ int SetGameSettings(config_t* settings, int argc, char* args[]) {
     return 0;
 }
 
-// Prints the current state of the game board for a given generation.
+// Prints the current state of the world for a given generation.
 //
 // Args:
 //   world: A pointer to a 2D array of characters where each character represents
-//          a cell in the game. '*' for a live cell and '-' for a dead cell.
-//   cols:  The number of columns in the game board.
-//   rows:  The number of rows in the game board.
+//          a cell in the world. '*' for a live cell and '-' for a dead cell.
+//   cols:  The number of columns in the world.
+//   rows:  The number of rows in the world.
 //   gen:   The current generation number that is being printed.
-void PrintWorld(const char** world, size_t cols, size_t rows, int gen) {
+void PrintWorld(const char** world, size_t rows, size_t cols, int gen) {
     printf("Generation %d:\n", gen);
 
     for (size_t i = 0 + kOffset; i <= rows; i++) {
@@ -116,15 +116,24 @@ void PrintWorld(const char** world, size_t cols, size_t rows, int gen) {
 int main(int argc, char* argv[]) {
     config_t settings;
 
-    if (SetGameSettings(&settings, argc, argv) > 0) {
+    if (SetGameSettings(&settings, argc, argv) != 0) {
         return 1;
     }
 
     // Read the file and create world
-    FILE* fd = fopen("")
+    FILE* fd = fopen(settings.filename, 'r');
+    if (!fd) {
+        perror("Error: File open operation failed");
+        return 1;
+    }
+    
+    char** world = CreateWorld(fd, settings.rows, settings.cols);
+    for (size_t gen = 0; gen <= settings.generations; gen++) {
+        PrintWorld(world, settings.rows, settings.cols, gen);
+        play(world);
+    }
 
-    // Print gen 0
-
-    // Play game for `gens` generations
+    fclose(fd);
+    CleanWorld(world);
     return 0;
 }
