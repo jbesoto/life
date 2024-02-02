@@ -138,6 +138,13 @@ char** CreateWorld(FILE* fd, size_t rows, size_t cols) {
     free(line);
     return world;
 }
+
+int CleanWorld(char** world, size_t rows) {
+    for (size_t i = 0; i < rows + 2; i++) {
+        free(world[i]);
+    }
+    free(world);
+    return 0;
 }
 
 // life [rows] [columns] [filename] [generations]
@@ -159,7 +166,7 @@ int main(int argc, char* argv[]) {
 
     for (size_t gen = 0; gen <= settings.generations; gen++) {
         PrintWorld(world, settings.rows, settings.cols, gen);
-        play(world);
+        // play(world);
     }
     CleanWorld(world, settings.rows);
 
