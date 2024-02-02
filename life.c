@@ -16,6 +16,28 @@ static const config_t kDefaults = {10, 10, "life.txt", 10};
 static const size_t kOffset = 1;
 
 
+// Prints the current state of the world for a given generation.
+//
+// Args:
+//   world: A pointer to a 2D array of characters where each character represents
+//          a cell in the world. '*' for a live cell and '-' for a dead cell.
+//   cols:  The number of columns in the world.
+//   rows:  The number of rows in the world.
+//   gen:   The current generation number that is being printed.
+void PrintWorld(const char** world, size_t rows, size_t cols, int gen) {
+    printf("Generation %d:\n", gen);
+
+    for (size_t i = 0 + kOffset; i <= rows; i++) {
+        for (size_t j = 0 + kOffset; j <= cols; j++) {
+            printf("%c", world[i][j]);
+            if (j == cols) {
+                putchar('\n');
+            }
+        }
+    }
+    printf("================================\n");
+}
+
 // Parses a string representing a positive integer into a `size_t`.
 //
 // Args:
