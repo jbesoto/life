@@ -261,7 +261,7 @@ void play(char** world, const config_t* config) {
 
     for (size_t i = kOffset; i <= config->rows; i++) {
         for (size_t j = kOffset; j <= config->cols; j++) {
-            char new_state = ComputeCellState(world_copy, i, j); 
+            char new_state = ComputeCellState((const char**)world_copy, i, j); 
             world[i][j] = new_state;
         }
     }
@@ -286,7 +286,7 @@ int main(int argc, char* argv[]) {
     fclose(fd);
 
     for (size_t gen = 0; gen <= config.generations; gen++) {
-        PrintWorld(world, &config, gen);
+        PrintWorld((const char**)world, &config, gen);
         play(world, &config);
     }
     FreeGrid(world, config.rows + 2);
