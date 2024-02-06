@@ -146,9 +146,17 @@ int ConfigureGame(config_t* config, int argc, char* args[]) {
 //   A pointer to the newly allocated 2D grid.
 char** CreateCharGrid(size_t rows, size_t cols, char ch) {
     char** grid = malloc(sizeof(char*) * rows);
+    if (!grid) {
+        perror("Failed to allocate grid");
+        exit(1);
+    }
 
     for (size_t i = 0; i < rows; i++) {
         grid[i] = malloc(sizeof(char) * cols);
+        if (!grid[i]) {
+            perror("Failed to allocate row in grid");
+            exit(1);
+        }
         memset(grid[i], ch, sizeof(char) * cols);
     }
     return grid;
@@ -278,7 +286,7 @@ int main(int argc, char* argv[]) {
 
     FILE* fd = fopen(config.filename, "r");
     if (!fd) {
-        perror("Error: File open operation failed");
+        perror("File open operation failed");
         return 1;
     }
     
