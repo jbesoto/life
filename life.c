@@ -32,7 +32,7 @@ int main(int argc, char* argv[]) {
 //
 // Returns:
 //   1 if the cell is alive ('*'), 0 otherwise.
-int IsAlive(char cell) {
+inline int IsAlive(char cell) {
     return cell == '*';
 }
 
@@ -43,7 +43,7 @@ int IsAlive(char cell) {
 //
 // Returns:
 //   1 if the cell is dead ('-'), 0 otherwise.
-int IsDead(char cell) {
+inline int IsDead(char cell) {
     return cell == '-';
 }
 

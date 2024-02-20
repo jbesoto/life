@@ -15,8 +15,8 @@ typedef struct {
     size_t generations;
 } config_t;
 
-extern const config_t kDefaults;
-extern const size_t kOffset;
+const config_t kDefaults = {10, 10, "life.txt", 10};
+const size_t kOffset = 1;
 
 int IsAlive(char cell);
 int IsDead(char cell);
