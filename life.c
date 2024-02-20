@@ -1,23 +1,29 @@
-#include <errno.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
- 
-#define MIN(a, b) (((a) < (b)) ? (a) : (b))
+#include "life.h"
 
-// Struct for storing game configurations
-typedef struct {
-    size_t rows;
-    size_t cols;
-    char* filename;
-    size_t generations;
-} config_t;
+// Usage: life [rows] [columns] [filename] [generations]
+int main(int argc, char* argv[]) {
+    config_t config;
 
-static const config_t kDefaults = {10, 10, "life.txt", 10};
+    if (ConfigureGame(&config, argc, argv) != 0) {
+        return 1;
+    }
 
-// Ensures that world traversal is kept within the valid cells
-static const size_t kOffset = 1;
+    FILE* fd = fopen(config.filename, "r");
+    if (!fd) {
+        perror("File open operation failed");
+        return 1;
+    }
+    
+    char** world = CreateWorld(fd, &config);
+    fclose(fd);
 
+    for (size_t gen = 0; gen <= config.generations; gen++) {
+        PrintWorld((const char**)world, &config, gen);
+        play(world, &config);
+    }
+    FreeGrid(world, config.rows + 2);
+    return 0;
+}
 
 // Determines if a cell is alive.
 //
@@ -274,29 +280,4 @@ void play(char** world, const config_t* config) {
         }
     }
     FreeGrid(world_copy, config->rows + 2);
-}
-
-// Usage: life [rows] [columns] [filename] [generations]
-int main(int argc, char* argv[]) {
-    config_t config;
-
-    if (ConfigureGame(&config, argc, argv) != 0) {
-        return 1;
-    }
-
-    FILE* fd = fopen(config.filename, "r");
-    if (!fd) {
-        perror("File open operation failed");
-        return 1;
-    }
-    
-    char** world = CreateWorld(fd, &config);
-    fclose(fd);
-
-    for (size_t gen = 0; gen <= config.generations; gen++) {
-        PrintWorld((const char**)world, &config, gen);
-        play(world, &config);
-    }
-    FreeGrid(world, config.rows + 2);
-    return 0;
 }
