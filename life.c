@@ -70,8 +70,8 @@ void PrintWorld(const char** world, config_t* config, int gen) {
 // Parses a string representing a positive integer into a `size_t`.
 //
 // Args:
-//   arg: A pointer to the null-terminated string to be parsed.
 //   out: A pointer to the variable where the parsed value will be stored.
+//   arg: A pointer to the null-terminated string to be parsed.
 //
 // Returns:
 //   0 if the parsing is successful and the value is a positive integer.
@@ -80,13 +80,13 @@ void PrintWorld(const char** world, config_t* config, int gen) {
 // Notes:
 //   The function uses `strtol` and checks for errors during the conversion. If
 //   `errno` is set or the parsed value is less than 1, it's considered an error.
-int ParseLong(const char* arg, size_t* out) {
+int ParseLong(size_t* out, const char* arg) {
     char* end;
     long value = strtol(arg, &end, 10);
-    
     if (errno != 0 || value < 1) {
        return 1;
     }
+
     *out = (size_t)value;
     return 0;
 }
@@ -118,13 +118,13 @@ int ConfigureGame(config_t* config, int argc, char* args[]) {
         return 1;
     }
     if (argc >= 2) {
-        if (ParseLong(args[1], &config->rows) != 0) {
+        if (ParseLong(&config->rows, args[1]) != 0) {
             printf("Error: Invalid input for rows, '%s'\n", args[1]);
             return 1;
         }
     }
     if (argc >= 3) {
-        if (ParseLong(args[2], &config->cols) != 0) {
+        if (ParseLong(&config->cols, args[2]) != 0) {
             printf("Error: Invalid input for columns, '%s'\n", args[2]);
             return 1;
         }
@@ -133,7 +133,7 @@ int ConfigureGame(config_t* config, int argc, char* args[]) {
         config->filename = args[3];
     }
     if (argc == 5) {
-        if (ParseLong(args[4], &config->generations) != 0) {
+        if (ParseLong(&config->generations, args[4]) != 0) {
             printf("Error: Invalid input for generations, '%s'\n", args[4]);
             return 1;
         }
