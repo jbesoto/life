@@ -233,8 +233,11 @@ int FreeGrid(char** grid, size_t rows) {
 //
 // Note:
 //   This function assumes that (x, y) are valid coordinates in the world.
-char ComputeNewState(const char** world, size_t y, size_t x) {
+char ComputeNewState(const char** world, const Coordinate *coord) {
   int neighbor_count = 0;
+  size_t x = coord->x;
+  size_t y = coord->y;
+
   for (size_t i = y - 1; i <= y + 1; i++) {
     for (size_t j = x - 1; j <= x + 1; j++) {
       if (IsAlive(world[i][j]) && !(i == y && j == x)) {
@@ -276,7 +279,8 @@ void play(char** world, const config_t* config) {
 
   for (size_t i = 0; i <= config->rows - kPaddingSize; i++) {
     for (size_t j = 0; j <= config->cols - kPaddingSize; j++) {
-      world[i][j] = ComputeNewState((const char**)world_copy, i, j);
+      const Coordinate coord = {j, i};
+      world[i][j] = ComputeNewState((const char**)world_copy, &coord);
     }
   }
   FreeGrid(world_copy, config->rows + 2);
