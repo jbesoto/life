@@ -14,7 +14,7 @@ int main(int argc, char* argv[]) {
     return 1;
   }
 
-  char** world = CreateWorld(fd, &config);
+  char** world = CreateWorldFromFile(fd, &config);
   fclose(fd);
 
   for (size_t gen = 0; gen <= config.generations; gen++) {
@@ -178,7 +178,7 @@ char** CreateCharGrid(size_t rows, size_t cols, char ch) {
 //
 // Returns:
 //   A pointer to the newly created world grid.
-char** CreateWorld(FILE* fd, const config_t* config) {
+char** CreateWorldFromFile(FILE* fd, const config_t* config) {
   char** world = CreateCharGrid(config->rows + kPaddingSize + 1,
                                 config->cols + kPaddingSize + 1, '-');
 

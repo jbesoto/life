@@ -24,7 +24,7 @@ int ParseLong(const char* arg, size_t* out);
 int ConfigureGame(config_t* config, int argc, char* args[]);
 int FreeGrid(char** grid, size_t rows);
 char** CreateCharGrid(size_t rows, size_t cols, char ch);
-char** CreateWorld(FILE* fd, const config_t* config);
+char** CreateWorldFromFile(FILE* fd, const config_t* config);
 char ComputeNewState(const char** world, size_t y, size_t x);
 void play(char** world, const config_t* config);
 void PrintWorld(const char** world, config_t* config, int gen);
