@@ -16,7 +16,7 @@ typedef struct {
 } config_t;
 
 const config_t kDefaults = {10, 10, "life.txt", 10};
-const size_t kOffset = 1;
+const size_t kPaddingSize = 1;
 
 int IsAlive(char cell);
 int IsDead(char cell);
