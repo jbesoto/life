@@ -2,6 +2,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
+
+#ifdef _WIN32
+#include <windows.h>
+#else
+#include <unistd.h>
+const char* kClearScreenCode = "\033[H\033[J";
+#endif
 
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))
 
@@ -17,6 +25,8 @@ static const config_t kDefaults = {10, 10, "life.txt", 10};
 
 // Ensures that world traversal is kept within the valid cells
 static const size_t kOffset = 1;
+
+static const useconds_t kInterval = 800000;  // microseconds
 
 
 // Determines if a cell is alive.
@@ -49,6 +59,12 @@ int IsDead(char cell) {
 //   config: A pointer to the config_t structure where the settings are stored.
 //   gen:    The current generation number that is being printed.
 void PrintWorld(const char** world, config_t* config, int gen) {
+#ifdef _WIN32
+    system("cls");
+#else
+    printf("%s", kClearScreenCode);
+#endif
+
     printf("Generation %d:\n", gen);
     for (size_t i = 0 + kOffset; i <= config->rows; i++) {
         for (size_t j = 0 + kOffset; j <= config->cols; j++) {
@@ -59,6 +75,8 @@ void PrintWorld(const char** world, config_t* config, int gen) {
         }
     }
     printf("================================\n");
+    fflush(stdout);
+    usleep(kInterval);
 }
 
 // Parses a string representing a positive integer into a `size_t`.
@@ -261,7 +279,7 @@ void play(char** world, const config_t* config) {
 
     for (size_t i = kOffset; i <= config->rows; i++) {
         for (size_t j = kOffset; j <= config->cols; j++) {
-            char new_state = ComputeCellState(world_copy, i, j); 
+            char new_state = ComputeCellState((const char **)world_copy, i, j); 
             world[i][j] = new_state;
         }
     }
@@ -286,7 +304,7 @@ int main(int argc, char* argv[]) {
     fclose(fd);
 
     for (size_t gen = 0; gen <= config.generations; gen++) {
-        PrintWorld(world, &config, gen);
+        PrintWorld((const char**)world, &config, gen);
         play(world, &config);
     }
     FreeGrid(world, config.rows + 2);
