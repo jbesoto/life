@@ -1,29 +1,33 @@
-#include "life.h"
+#include <errno.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
 
-// Usage: life [rows] [columns] [filename] [generations]
-int main(int argc, char* argv[]) {
-  config_t config;
+#ifdef _WIN32
+#include <windows.h>
+#else
+#include <unistd.h>
+const char* kClearScreenCode = "\033[H\033[J";
+#endif
 
-  if (ConfigureGame(&config, argc, argv) != 0) {
-    return 1;
-  }
+#define MIN(a, b) (((a) < (b)) ? (a) : (b))
 
-  FILE* fd = fopen(config.filename, "r");
-  if (!fd) {
-    perror("File open operation failed");
-    return 1;
-  }
+// Struct for storing game configurations
+typedef struct {
+    size_t rows;
+    size_t cols;
+    char* filename;
+    size_t generations;
+} config_t;
 
-  char** world = CreateWorldFromFile(fd, &config);
-  fclose(fd);
+static const config_t kDefaults = {10, 10, "life.txt", 10};
 
-  for (size_t gen = 0; gen <= config.generations; gen++) {
-    PrintWorld((const char**)world, &config, gen);
-    play(world, &config);
-  }
-  FreeGrid(world, config.rows + 2);
-  return 0;
-}
+// Ensures that world traversal is kept within the valid cells
+static const size_t kOffset = 1;
+
+static const useconds_t kInterval = 800000;  // microseconds
+
 
 // Determines if a cell is alive.
 //
@@ -52,16 +56,24 @@ inline int IsDead(char cell) { return cell == '-'; }
 //   config: A pointer to the config_t structure where the settings are stored.
 //   gen:    The current generation number that is being printed.
 void PrintWorld(const char** world, config_t* config, int gen) {
-  printf("Generation %d:\n", gen);
-  for (size_t i = kPadding; i <= config->rows; i++) {
-    for (size_t j = kPadding; j <= config->cols; j++) {
-      printf("%c", world[i][j]);
-      if (j == config->cols) {
-        putchar('\n');
-      }
+#ifdef _WIN32
+    system("cls");
+#else
+    printf("%s", kClearScreenCode);
+#endif
+
+    printf("Generation %d:\n", gen);
+    for (size_t i = 0 + kOffset; i <= config->rows; i++) {
+        for (size_t j = 0 + kOffset; j <= config->cols; j++) {
+            printf("%c", world[i][j]);
+            if (j == config->cols) {
+                putchar('\n');
+            }
+        }
     }
-  }
-  printf("================================\n");
+    printf("================================\n");
+    fflush(stdout);
+    usleep(kInterval);
 }
 
 // Parses a string representing a positive integer into a `size_t`.
@@ -277,11 +289,36 @@ void play(char** world, const config_t* config) {
     memcpy(world_copy[i], world[i], sizeof(char) * (config->cols + 2));
   }
 
-  for (size_t i = 0; i <= config->rows - kPadding; i++) {
-    for (size_t j = 0; j <= config->cols - kPadding; j++) {
-      const Coordinate coord = {j, i};
-      world[i][j] = ComputeNewState((const char**)world_copy, &coord);
+    for (size_t i = kOffset; i <= config->rows; i++) {
+        for (size_t j = kOffset; j <= config->cols; j++) {
+            char new_state = ComputeCellState((const char **)world_copy, i, j); 
+            world[i][j] = new_state;
+        }
     }
-  }
-  FreeGrid(world_copy, config->rows + 2);
+    FreeGrid(world_copy, config->rows + 2);
+}
+
+// Usage: life [rows] [columns] [filename] [generations]
+int main(int argc, char* argv[]) {
+    config_t config;
+
+    if (ConfigureGame(&config, argc, argv) != 0) {
+        return 1;
+    }
+
+    FILE* fd = fopen(config.filename, "r");
+    if (!fd) {
+        perror("Error: File open operation failed");
+        return 1;
+    }
+    
+    char** world = CreateWorld(fd, &config);
+    fclose(fd);
+
+    for (size_t gen = 0; gen <= config.generations; gen++) {
+        PrintWorld((const char**)world, &config, gen);
+        play(world, &config);
+    }
+    FreeGrid(world, config.rows + 2);
+    return 0;
 }
