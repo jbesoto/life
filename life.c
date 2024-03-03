@@ -53,8 +53,8 @@ inline int IsDead(char cell) { return cell == '-'; }
 //   gen:    The current generation number that is being printed.
 void PrintWorld(const char** world, config_t* config, int gen) {
   printf("Generation %d:\n", gen);
-  for (size_t i = 0 + kPaddingSize; i <= config->rows; i++) {
-    for (size_t j = 0 + kPaddingSize; j <= config->cols; j++) {
+  for (size_t i = kPadding; i <= config->rows; i++) {
+    for (size_t j = kPadding; j <= config->cols; j++) {
       printf("%c", world[i][j]);
       if (j == config->cols) {
         putchar('\n');
@@ -179,20 +179,20 @@ char** CreateCharGrid(size_t rows, size_t cols, char ch) {
 // Returns:
 //   A pointer to the newly created world grid.
 char** CreateWorldFromFile(FILE* fd, const config_t* config) {
-  char** world = CreateCharGrid(config->rows + kPaddingSize + 1,
-                                config->cols + kPaddingSize + 1, '-');
+  char** world = CreateCharGrid(config->rows + kPadding + 1,
+                                config->cols + kPadding + 1, '-');
 
   char* line = NULL;
   size_t n = 0;
-  for (size_t i = kPaddingSize; i <= config->rows; i++) {
+  for (size_t i = kPadding; i <= config->rows; i++) {
     if (getline(&line, &n, fd) < 0) {
       break;
     }
-    for (size_t j = kPaddingSize; j <= MIN(config->cols, n); j++) {
-      if (line[j - kPaddingSize] != '*') {
+    for (size_t j = kPadding; j <= MIN(config->cols, n); j++) {
+      if (line[j - kPadding] != '*') {
         continue;
       }
-      world[i][j] = line[j - kPaddingSize];
+      world[i][j] = line[j - kPadding];
     }
     free(line);
   }
@@ -273,12 +273,12 @@ char ComputeNewState(const char** world, const Coordinate *coord) {
 //           including the number of rows, columns, and other settings.
 void play(char** world, const config_t* config) {
   char** world_copy = CreateCharGrid(config->rows + 2, config->cols + 2, '-');
-  for (size_t i = 0; i <= config->rows - kPaddingSize; i++) {
+  for (size_t i = 0; i <= config->rows - kPadding; i++) {
     memcpy(world_copy[i], world[i], sizeof(char) * (config->cols + 2));
   }
 
-  for (size_t i = 0; i <= config->rows - kPaddingSize; i++) {
-    for (size_t j = 0; j <= config->cols - kPaddingSize; j++) {
+  for (size_t i = 0; i <= config->rows - kPadding; i++) {
+    for (size_t j = 0; j <= config->cols - kPadding; j++) {
       const Coordinate coord = {j, i};
       world[i][j] = ComputeNewState((const char**)world_copy, &coord);
     }

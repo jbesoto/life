@@ -21,7 +21,7 @@ typedef struct Coordinate {
 } Coordinate;
 
 const config_t kDefaults = {10, 10, "life.txt", 10};
-const size_t kPaddingSize = 1;
+const size_t kPadding = 1;
 
 int IsAlive(char cell);
 int IsDead(char cell);
