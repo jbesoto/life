@@ -233,10 +233,10 @@ int FreeGrid(char** grid, size_t rows) {
 //
 // Note:
 //   This function assumes that (x, y) are valid coordinates in the world.
-char ComputeCellState(const char** world, size_t y, size_t x) {
+char ComputeNewState(const char** world, size_t y, size_t x) {
   int neighbor_count = 0;
-  for (size_t i = y - kPaddingSize; i <= y + kPaddingSize; i++) {
-    for (size_t j = x - kPaddingSize; j <= x + kPaddingSize; j++) {
+  for (size_t i = y - 1; i <= y + 1; i++) {
+    for (size_t j = x - 1; j <= x + 1; j++) {
       if (IsAlive(world[i][j]) && !(i == y && j == x)) {
         neighbor_count++;
       }
@@ -270,14 +270,13 @@ char ComputeCellState(const char** world, size_t y, size_t x) {
 //           including the number of rows, columns, and other settings.
 void play(char** world, const config_t* config) {
   char** world_copy = CreateCharGrid(config->rows + 2, config->cols + 2, '-');
-  for (size_t i = kPaddingSize; i <= config->rows; i++) {
+  for (size_t i = 0; i <= config->rows - kPaddingSize; i++) {
     memcpy(world_copy[i], world[i], sizeof(char) * (config->cols + 2));
   }
 
-  for (size_t i = kPaddingSize; i <= config->rows; i++) {
-    for (size_t j = kPaddingSize; j <= config->cols; j++) {
-      char new_state = ComputeCellState((const char**)world_copy, i, j);
-      world[i][j] = new_state;
+  for (size_t i = 0; i <= config->rows - kPaddingSize; i++) {
+    for (size_t j = 0; j <= config->cols - kPaddingSize; j++) {
+      world[i][j] = ComputeNewState((const char**)world_copy, i, j);
     }
   }
   FreeGrid(world_copy, config->rows + 2);
