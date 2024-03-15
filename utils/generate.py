@@ -19,14 +19,14 @@ import sys
 import numpy as np
 
 def main():
-    if len(sys.argv) > 4:
+    if len(sys.argv) == 1 or len(sys.argv) > 4:
         print("Usage: ./generate [ROWS] [COLUMNS]")
         exit(1)
 
-    rows, cols = sys.argv[1:]
+    rows, cols = map(int, sys.argv[1:])
     file_path = './life.txt'
 
-    grid = np.random.choice(['*', ' '], size=(rows, cols), p=[0.05, 0.95])
+    grid = np.random.choice(['*', ' '], size=(rows, cols), p=[0.085, 0.915])
 
     grid_str = '\n'.join(''.join(row) for row in grid)
 
