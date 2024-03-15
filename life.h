@@ -12,8 +12,6 @@
 #include <unistd.h>
 #endif
 
-#define MIN(a, b) (((a) < (b)) ? (a) : (b))
-
 // Struct for storing game configurations
 typedef struct {
   size_t rows;
@@ -30,7 +28,10 @@ typedef struct Coordinate {
 static const config_t kDefaults = {10, 10, "life.txt", 10};
 static const size_t kPadding = 1;
 static const useconds_t kInterval = 800000;  // microseconds
+static const char kAliveChar = '*';
+static const char kDeadChar = ' ';
 
+static inline size_t min(size_t a, size_t b);
 int IsAlive(char cell);
 int IsDead(char cell);
 int ParseLong(size_t* out, const char* arg);

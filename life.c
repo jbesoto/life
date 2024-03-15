@@ -25,6 +25,18 @@ int main(int argc, char* argv[]) {
   return 0;
 }
 
+// Returns smallest size_t between 'a' and 'b'
+// 
+// Args:
+//   a: a number.
+//   b: another number.
+//
+// Returns:
+//   A number
+static inline size_t min(size_t a, size_t b) {
+  return (a < b) ? a : b;
+}
+
 // Determines if a cell is alive.
 //
 // Args:
@@ -32,7 +44,7 @@ int main(int argc, char* argv[]) {
 //
 // Returns:
 //   1 if the cell is alive ('*'), 0 otherwise.
-inline int IsAlive(char cell) { return cell == '*'; }
+inline int IsAlive(char cell) { return cell == kAliveChar; }
 
 // Determines if a cell is dead.
 //
@@ -40,8 +52,8 @@ inline int IsAlive(char cell) { return cell == '*'; }
 //   cell: A character representing the current state of the cell.
 //
 // Returns:
-//   1 if the cell is dead ('-'), 0 otherwise.
-inline int IsDead(char cell) { return cell == '-'; }
+//   1 if the cell is dead (' '), 0 otherwise.
+inline int IsDead(char cell) { return cell == kDeadChar; }
 
 // Prints the current state of the world for a given generation.
 //
@@ -188,7 +200,7 @@ char** CreateCharGrid(size_t rows, size_t cols, char ch) {
 //   A pointer to the newly created world grid.
 char** CreateWorldFromFile(FILE* fd, const config_t* config) {
   char** world = CreateCharGrid(config->rows + kPadding + 1,
-                                config->cols + kPadding + 1, '-');
+                                config->cols + kPadding + 1, kDeadChar);
 
   char* line = NULL;
   size_t n = 0;
@@ -196,8 +208,9 @@ char** CreateWorldFromFile(FILE* fd, const config_t* config) {
     if (getline(&line, &n, fd) < 0) {
       break;
     }
-    for (size_t j = kPadding; j <= MIN(config->cols, n); j++) {
-      if (line[j - kPadding] != '*') {
+    for (size_t j = kPadding; j <= min(config->cols, n); j++) {
+      // Skip spaces
+      if (IsDead(line[j - kPadding])) {
         continue;
       }
       world[i][j] = line[j - kPadding];
@@ -257,10 +270,10 @@ char ComputeNewState(const char** world, const Coordinate* coord) {
   char new_state = world[y][x];
   if (IsAlive(world[y][x])) {
     if (neighbor_count < 2 || neighbor_count > 3) {
-      new_state = '-';
+      new_state = kDeadChar;
     }
   } else if (IsDead(world[y][x]) && neighbor_count == 3) {
-    new_state = '*';
+    new_state = kAliveChar;
   }
 
   return new_state;
