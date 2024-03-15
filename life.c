@@ -260,12 +260,16 @@ void play(char** world, const config_t* config) {
     memcpy(world_copy[i], world[i], sizeof(char) * (config->cols + 2));
   }
 
+  Coordinate coord;
   for (size_t i = kPadding; i <= config->rows; i++) {
     for (size_t j = kPadding; j <= config->cols; j++) {
-      char new_state = ComputeNewState((const char**)world_copy, i, j);
+      coord.x = j;
+      coord.y = i;
+      char new_state = ComputeNewState((const char**)world_copy, &coord);
       world[i][j] = new_state;
     }
   }
+  
   FreeGrid(world_copy, config->rows + 2);
 }
 
