@@ -269,7 +269,7 @@ void play(char** world, const config_t* config) {
       world[i][j] = new_state;
     }
   }
-  
+
   FreeGrid(world_copy, config->rows + 2);
 }
 
@@ -287,7 +287,7 @@ int main(int argc, char* argv[]) {
     return 1;
   }
 
-  char** world = CreateWorld(fd, &config);
+  char** world = CreateWorldFromFile(fd, &config);
   fclose(fd);
 
   for (size_t gen = 0; gen <= config.generations; gen++) {
