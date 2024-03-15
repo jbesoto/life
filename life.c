@@ -1,5 +1,30 @@
 #include "life.h"
 
+// Usage: life [rows] [columns] [filename] [generations]
+int main(int argc, char* argv[]) {
+  config_t config;
+
+  if (ConfigureGame(&config, argc, argv) != 0) {
+    return 1;
+  }
+
+  FILE* fd = fopen(config.filename, "r");
+  if (!fd) {
+    perror("Error: File open operation failed");
+    return 1;
+  }
+
+  char** world = CreateWorldFromFile(fd, &config);
+  fclose(fd);
+
+  for (size_t gen = 0; gen <= config.generations; gen++) {
+    PrintWorld((const char**)world, &config, gen);
+    play(world, &config);
+  }
+  FreeGrid(world, config.rows + 2);
+  return 0;
+}
+
 // Determines if a cell is alive.
 //
 // Args:
@@ -271,29 +296,4 @@ void play(char** world, const config_t* config) {
   }
 
   FreeGrid(world_copy, config->rows + 2);
-}
-
-// Usage: life [rows] [columns] [filename] [generations]
-int main(int argc, char* argv[]) {
-  config_t config;
-
-  if (ConfigureGame(&config, argc, argv) != 0) {
-    return 1;
-  }
-
-  FILE* fd = fopen(config.filename, "r");
-  if (!fd) {
-    perror("Error: File open operation failed");
-    return 1;
-  }
-
-  char** world = CreateWorldFromFile(fd, &config);
-  fclose(fd);
-
-  for (size_t gen = 0; gen <= config.generations; gen++) {
-    PrintWorld((const char**)world, &config, gen);
-    play(world, &config);
-  }
-  FreeGrid(world, config.rows + 2);
-  return 0;
 }
