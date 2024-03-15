@@ -1,0 +1,1 @@
+./life 5 5 tests/extinction/*.txt 3

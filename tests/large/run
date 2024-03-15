@@ -1,0 +1,1 @@
+./life 10 11 tests/large/*.txt 1
