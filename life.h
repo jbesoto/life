@@ -6,8 +6,15 @@
 #include <stdlib.h>
 #include <string.h>
 
+#ifdef _WIN32
+#include <windows.h>
+#else
+#include <unistd.h>
+#endif
+
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))
 
+// Struct for storing game configurations
 typedef struct {
     size_t rows;
     size_t cols;
@@ -20,12 +27,13 @@ typedef struct Coordinate {
     size_t y;
 } Coordinate;
 
-const config_t kDefaults = {10, 10, "life.txt", 10};
-const size_t kPadding = 1;
+static const config_t kDefaults = {10, 10, "life.txt", 10};
+static const size_t kPadding = 1;
+static const useconds_t kInterval = 800000;  // microseconds
 
 int IsAlive(char cell);
 int IsDead(char cell);
-int ParseLong(const char* arg, size_t* out);
+int ParseLong(size_t* out, const char* arg);
 int ConfigureGame(config_t* config, int argc, char* args[]);
 int FreeGrid(char** grid, size_t rows);
 char** CreateCharGrid(size_t rows, size_t cols, char ch);
