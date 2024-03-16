@@ -7,15 +7,14 @@ all: $(TARGET)
 
 $(TARGET): $(OBJS)
 	$(CC) $(CFLAGS) -o $(TARGET) $(OBJS)
-	rm -f $(OBJS)
 
-life.o: life.c life.h
-	$(CC) $(CFLAGS) -c life.c
+life.o: src/life.c src/life.h
+	$(CC) $(CFLAGS) -c src/life.c
 
-utils.o: utils.c utils.h
-	$(CC) $(CFLAGS) -c utils.c
+utils.o: src/utils.c src/utils.h
+	$(CC) $(CFLAGS) -c src/utils.c
 
 clean:
-	rm -f $(TARGET)
+	rm -f $(TARGET) $(OBJS)
 
 .PHONY: all clean

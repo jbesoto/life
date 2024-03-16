@@ -1,15 +1,11 @@
 TODO
 - [x] Create header file
-- [ ] Set testcases to run automatically in GitHub actions
-- [ ] Optimize game, board is being allocated and freed in each generation
-    - [ ] Refactor game to allocate board only once
+- [x] Use kPadding and struct Coordinate{size_t x, size_t y};
+- [x] Set testcases to run automatically in GitHub actions
+- [ ] Implement flags and options
+    - [ ] Flag: -d --debug, does not create the animation
+    - [ ] Options: -r --rows, -c --columns, -f --file, -g --generations
+- [x] Optimize game, board is being allocated and freed in each generation
+    - [x] Refactor game to allocate board only once
     - [ ] Figure out a way to optimize board parsing (can I do better than O(n * m))
 ---
-BUGS
-
-- [ ]
-```
-double free or corruption (fasttop)
-[1]    196823 IOT instruction (core dumped)  ./life
-```
-    - Happens running stable version of code with any board size
