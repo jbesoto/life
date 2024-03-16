@@ -1,1 +1,1 @@
-./life 2 3 tests/underpopulated/*.txt 1
+./life 2 3 tests/underpopulated/input.txt 1

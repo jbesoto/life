@@ -1,1 +1,1 @@
-./life 5 5 tests/bordered/*.txt 3
+./life 5 5 tests/bordered/input.txt 3

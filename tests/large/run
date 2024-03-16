@@ -1,1 +1,1 @@
-./life 10 11 tests/large/*.txt 1
+./life 10 11 tests/large/input.txt 1

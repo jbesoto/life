@@ -24,6 +24,11 @@ else
 fi
 
 TESTS=tests
+OUTPUT=output.txt
+EXPECTED=expected.txt
+INPUT=input.txt
+PROCEDURE=run
+readonly TESTS OUTPUT EXPECTED INPUT PROCEDURE
 
 # Check to see if a file exists.
 exists() {
@@ -49,34 +54,33 @@ fi
 passed=0
 failed=0
 for testcase in "${TESTS}"/*/; do
-    if ! exists "${testcase}input.txt"; then
-        echo "Error: Input file 'input.txt' does not exist for '${testcase}'";
+    if ! exists "${testcase}${INPUT}"; then
+        echo "Error: Input file '${INPUT}' does not exist for '${testcase}'";
         echo -e "Skipping...\n"
         continue
     fi
-    if ! exists "${testcase}expected"; then
-        echo "Error: Expected output 'expected' does not exist for '${testcase}'"
+    if ! exists "${testcase}${EXPECTED}"; then
+        echo "Error: Expected output '${EXPECTED}' does not exist for '${testcase}'"
         echo -e "Skipping...\n"
         continue
     fi
-    if ! exists "${testcase}run"; then
-        echo "Error: No procedure 'run' to execute the test was found for '${testcase}'";
+    if ! exists "${testcase}${PROCEDURE}"; then
+        echo "Error: No procedure '${PROCEDURE}' to execute the test was found for '${testcase}'";
         echo -e "Skipping...\n"
         continue
     fi
 
-    command=$(head -n 1 "${testcase}/run")
-    eval "${command}" > "${testcase}output"
+    command=$(head -n 1 "${testcase}${PROCEDURE}")
+    eval "${command}" > "${testcase}${OUTPUT}"
     
-    if diff -q "${testcase}output" "${testcase}expected"; then
+    if diff "${testcase}${OUTPUT}" "${testcase}${EXPECTED}" > /dev/null; then
         pmsg="PASS"
         passed=$((passed + 1))
+        rm -f "${testcase}${OUTPUT}"
     else
         pmsg="FAIL"
         failed=$((failed + 1))
     fi
-
-    rm "${testcase}output"
 
     [ "$pmsg" = "PASS" ] && rowcolor=$GREEN || rowcolor=$RED
     printf "${rowcolor}%-50s %-5s ${RESET}\n" "$(basename ${testcase})" "${pmsg}"

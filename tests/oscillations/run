@@ -1,1 +1,1 @@
-./life 5 5 oscillations/*.txt 2
+./life 5 5 tests/oscillations/input.txt 2

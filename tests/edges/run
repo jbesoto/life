@@ -1,1 +1,1 @@
-./life 4 3 tests/edges/*.txt 1
+./life 4 3 tests/edges/input.txt 1

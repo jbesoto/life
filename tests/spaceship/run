@@ -1,1 +1,1 @@
-./life 5 5 tests/spaceship/*.txt 2
+./life 5 5 tests/spaceship/input.txt 2

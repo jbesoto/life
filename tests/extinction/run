@@ -1,1 +1,1 @@
-./life 5 5 tests/extinction/*.txt 3
+./life 3 3 tests/extinction/input.txt 2

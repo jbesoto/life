@@ -1,1 +1,1 @@
-./life 4 4 tests/reproduction/*.txt 1
+./life 4 3 tests/reproduction/input.txt 1
