@@ -10,8 +10,10 @@
 
 #ifdef _WIN32
 #include <windows.h>
+#define CLEAR "cls"
 #else
 #include <unistd.h>
+#define CLEAR "clear"
 #endif
 
 // Struct for storing game configurations
@@ -25,7 +27,7 @@ typedef struct {
 static int debug_flag = 0;
 static const config_t kDefaults = {10, 10, "life.txt", 10};
 static const size_t kPadding = 1;
-static const useconds_t kInterval = 0;  // microseconds
+static const useconds_t kInterval = 600000;  // microseconds
 static const char kAliveChar = '*';
 static const char kDeadChar = ' ';
 

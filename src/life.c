@@ -275,6 +275,8 @@ int ConfigureGame(config_t* config, int argc, char* args[]) {
  * @param gen    The current generation number being printed.
  */
 void PrintWorld(const char** world, const config_t* config, int gen) {
+  if (!debug_flag) { system(CLEAR); }
+
   printf("Generation %d:\n", gen);
   for (size_t i = kPadding; i <= config->rows; i++) {
     for (size_t j = kPadding; j <= config->cols; j++) {
@@ -285,13 +287,11 @@ void PrintWorld(const char** world, const config_t* config, int gen) {
     }
   }
   puts("================================");
-  //   fflush(stdout);
-  //   usleep(kInterval);
-  // #ifdef _WIN32
-  //   system("cls");
-  // #else
-  //   putchar('\r');
-  // #endif
+  
+  if (!debug_flag) {
+    fflush(stdout);
+    usleep(kInterval);
+  }
 }
 
 /**

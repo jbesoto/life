@@ -71,7 +71,7 @@ for testcase in "${TESTS}"/*/; do
     fi
 
     command=$(head -n 1 "${testcase}${PROCEDURE}")
-    eval "${command}" > "${testcase}${OUTPUT}"
+    eval "${command} --debug" > "${testcase}${OUTPUT}"
     
     if diff "${testcase}${OUTPUT}" "${testcase}${EXPECTED}" > /dev/null; then
         pmsg="PASS"
