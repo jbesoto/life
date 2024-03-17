@@ -4,14 +4,15 @@
  * Implements the logic for simulating Conway's Game of Life, including
  * functions for setting up the game environment, simulating generations,
  * and printing the state of the game world.
- *
- * Usage:
- *   ./life [rows] [columns] [filename] [generations]
- *
- * Where:
- *   - rows and columns specify the size of the world.
- *   - filename is the path to a file describing the initial state of the world.
- *   - generations is the number of generations to simulate.
+ * 
+ * Usage: ./life [options]
+ * Options:
+ *   -r, --rows NUM           Set the number of rows (default: 10)
+ *   -c, --columns NUM        Set the number of columns (default: 10)
+ *   -f, --filename FILENAME  Specify the filename to use (default: life.txt)
+ *   -n, --generations NUM    Set the number of generations (default: 10)
+ *   --debug                  Enable debug mode
+ *   -h, --help               Print this message
  *
  * Author: Juan Diego Becerra
  * Date: 2024-03-16
@@ -27,19 +28,19 @@ int main(int argc, char* argv[]) {
 
   FILE* fd = fopen(config.filename, "r");
   if (!fd) {
-    fprintf(stderr, "Error: Failed to open world file, '%s'", config.filename);
+    fprintf(stderr, "Error: Failed to open file, '%s'\n", config.filename);
     return 1;
   }
 
   char** world = CreateWorld(fd, (const config_t*)&config);
   if (!world) {
-    fprintf(stderr, "Error: Unable to create world, memory allocation failed.");
+    fprintf(stderr, "Error: Unable to create world, memory allocation failed.\n");
     return 1;
   }
   fclose(fd);
 
   if (PlayGame(world, (const config_t*)&config) < 0) {
-    fprintf(stderr, "Error: Unable to copy world, memory allocation failed.");
+    fprintf(stderr, "Error: Unable to copy world, memory allocation failed.\n");
     FreeGrid(world, config.rows + kPadding + 1);
     return 1;
   }
@@ -207,36 +208,59 @@ char** CreateWorld(FILE* fd, const config_t* config) {
  *         error in the input arguments or their parsing.
  */
 int ConfigureGame(config_t* config, int argc, char* args[]) {
-  if (argc > 5) {
-    fprintf(stderr, "Usage: life [rows] [columns] [filename] [generations]\n");
-    return -1;
-  }
-
   // Set default settings
   config->rows = kDefaults.rows;
   config->cols = kDefaults.cols;
   config->filename = kDefaults.filename;
   config->generations = kDefaults.generations;
 
-  if (argc >= 2) {
-    if (ParseLong(&config->rows, args[1]) < 0) {
-      fprintf(stderr, "Error: Invalid input for rows, '%s'\n", args[1]);
-      return -1;
-    }
-  }
-  if (argc >= 3) {
-    if (ParseLong(&config->cols, args[2]) < 0) {
-      fprintf(stderr, "Error: Invalid input for columns, '%s'\n", args[2]);
-      return -1;
-    }
-  }
-  if (argc >= 4) {
-    config->filename = args[3];
-  }
-  if (argc == 5) {
-    if (ParseLong(&config->generations, args[4]) < 0) {
-      fprintf(stderr, "Error: Invalid input for generations, '%s'\n", args[4]);
-      return -1;
+  static struct option longopts[] = {
+    {"rows",        required_argument, 0,           'r'},
+    {"columns",     required_argument, 0,           'c'},
+    {"filename",    required_argument, 0,           'f'},
+    {"generations", required_argument, 0,           'n'},
+    {"debug",       no_argument,       &debug_flag,  1 },
+    {"help",        no_argument,       0,           'h'},
+    {0, 0, 0, 0}
+  };
+
+  int opt;
+  char* optstring = "dhr:c:f:n:";
+  while ((opt = getopt_long(argc, args, optstring, longopts, 0)) != -1) {
+    switch (opt) {
+      case 'd':
+        debug_flag = 1;
+        break;
+
+      case 'r':
+        if (ParseLong(&config->rows, optarg) < 0) {
+          fprintf(stderr, "Error: Invalid input for rows, '%s'\n", optarg);
+          return -1;
+        }
+        break;
+
+      case 'c':
+        if (ParseLong(&config->cols, optarg) < 0) {
+          fprintf(stderr, "Error: Invalid input for columns, '%s'\n", optarg);
+          return -1;
+        }
+        break;
+
+      case 'f':
+        config->filename = optarg;
+        break;
+
+      case 'n':
+        if (ParseLong(&config->generations, optarg) < 0) {
+          fprintf(stderr, "Error: Invalid input for generations, '%s'\n", optarg);
+          return -1;
+        }
+        break;
+
+      case 'h':
+      case '?': 
+        PrintUsage();
+        return -1;
     }
   }
 
@@ -268,6 +292,23 @@ void PrintWorld(const char** world, const config_t* config, int gen) {
   // #else
   //   putchar('\r');
   // #endif
+}
+
+/**
+ * @brief Prints the usage of the program.
+*/
+void PrintUsage() {
+  fprintf(stderr, "Usage: ./life [options]\n");
+  fprintf(stderr, "Options:\n");
+  fprintf(stderr, "  -r, --rows NUM           Set the number of rows (default: %ld)\n", kDefaults.rows);
+  fprintf(stderr, "  -c, --columns NUM        Set the number of columns (default: %ld)\n", kDefaults.cols);
+  fprintf(stderr, "  -f, --filename FILENAME  Specify the filename to use (default: %s)\n", kDefaults.filename);
+  fprintf(stderr, "  -n, --generations NUM    Set the number of generations (default: %ld)\n", kDefaults.generations);
+  fprintf(stderr, "  --debug                  Enable debug mode\n");
+  fprintf(stderr, "  -h, --help               Print this message\n");
+  fprintf(stderr, "\n");
+  fprintf(stderr, "Example:\n");
+  fprintf(stderr, "  ./life --rows 20 --columns 20 --filename \"world.txt\" -n 100\n");
 }
 
 /**

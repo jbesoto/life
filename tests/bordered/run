@@ -1,1 +1,1 @@
-./life 5 5 tests/bordered/input.txt 3
+./life -r 5 -c 5 -f tests/bordered/input.txt -n 3

@@ -1,1 +1,1 @@
-./life 10 10 tests/simple/input.txt  
+./life -f tests/simple/input.txt  

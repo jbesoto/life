@@ -22,6 +22,7 @@ typedef struct {
   size_t generations;
 } config_t;
 
+static int debug_flag = 0;
 static const config_t kDefaults = {10, 10, "life.txt", 10};
 static const size_t kPadding = 1;
 static const useconds_t kInterval = 0;  // microseconds
@@ -34,6 +35,7 @@ char** CreateWorld(FILE* fd, const config_t* config);
 static inline int IsAlive(char cell);
 static inline int IsDead(char cell);
 int PlayGame(char** world, const config_t* config);
+static inline void PrintUsage(void);
 void PrintWorld(const char** world, const config_t* config, int gen);
 void SimulateGeneration(char** world, char** world_ref, const config_t* config);
 

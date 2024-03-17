@@ -1,1 +1,1 @@
-./life 2 2 tests/stable/input.txt 2
+./life -r 2 -c 2 -f tests/stable/input.txt -n 2

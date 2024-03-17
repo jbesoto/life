@@ -1,1 +1,1 @@
-./life 4 3 tests/reproduction/input.txt 1
+./life -r 4 -c 3 -f tests/reproduction/input.txt -n 1

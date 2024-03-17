@@ -1,1 +1,1 @@
-./life 3 3 tests/extinction/input.txt 2
+./life -r 3 -c 3 -f tests/extinction/input.txt -n 2

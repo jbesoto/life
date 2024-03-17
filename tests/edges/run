@@ -1,1 +1,1 @@
-./life 4 3 tests/edges/input.txt 1
+./life -r 4 -c 3 -f tests/edges/input.txt -n 1
