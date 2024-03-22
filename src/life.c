@@ -26,18 +26,11 @@ int main(int argc, char* argv[]) {
     return 1;
   }
 
-  FILE* fd = fopen(config.filename, "r");
-  if (!fd) {
-    fprintf(stderr, "Error: Failed to open file, '%s'\n", config.filename);
-    return 1;
-  }
-
-  char** world = CreateWorld(fd, (const config_t*)&config);
+  char** world = CreateWorld((const config_t*)&config);
   if (!world) {
     fprintf(stderr, "Error: Unable to create world, memory allocation failed.\n");
     return 1;
   }
-  fclose(fd);
 
   if (PlayGame(world, (const config_t*)&config) < 0) {
     fprintf(stderr, "Error: Unable to copy world, memory allocation failed.\n");
@@ -157,7 +150,6 @@ char ComputeCellState(const char** world, size_t row, size_t col) {
  * grid. The grid is extended with padding as specified by the configuration.
  * Cells are set to alive or dead based on the file contents.
  *
- * @param fd     The file descriptor of the world configuration file.
  * @param config A constant pointer to the game configuration.
  * 
  * @return Returns a pointer to the created 2D world grid or NULL if memory
@@ -166,10 +158,16 @@ char ComputeCellState(const char** world, size_t row, size_t col) {
  * @note This function allocates memory for the world grid that must be freed
  *       by calling `FreeGrid`.
  */
-char** CreateWorld(FILE* fd, const config_t* config) {
+char** CreateWorld(const config_t* config) {
   char** world = CreateCharGrid(config->rows + kPadding + 1,
                                 config->cols + kPadding + 1, kDeadChar);
   if (!world) {
+    return NULL;
+  }
+
+  FILE* fd = fopen(config->filename, "r");
+  if (!fd) {
+    fprintf(stderr, "Error: Failed to open file, '%s'\n", config->filename);
     return NULL;
   }
 
@@ -189,6 +187,7 @@ char** CreateWorld(FILE* fd, const config_t* config) {
   }
 
   free(line);
+  fclose(fd);
   return world;
 }
 

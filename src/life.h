@@ -33,7 +33,7 @@ static const char kDeadChar = ' ';
 
 int ConfigureGame(config_t* config, int argc, char* args[]);
 char ComputeCellState(const char** world, size_t row, size_t col);
-char** CreateWorld(FILE* fd, const config_t* config);
+char** CreateWorld(const config_t* config);
 static inline int IsAlive(char cell);
 static inline int IsDead(char cell);
 int PlayGame(char** world, const config_t* config);
